@@ -1,10 +1,34 @@
 import { Link, useParams } from 'react-router'
 import { ArrowLeft } from 'lucide-react'
-import { projects } from '@/data/projects'
+import { useProjects } from '@/hooks/useProjects'
 import NotFound from '@/pages/NotFound'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function ProjectDetails() {
   const { slug } = useParams()
+  const { projects, loading, error } = useProjects()
+
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+        <p role="status" className="text-muted-foreground">
+          <Spinner className="size-5" />
+          Carregando projeto...
+        </p>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+        <p role="alert" className="text-destructive">
+          {error}
+        </p>
+      </main>
+    )
+  }
+
   const project = projects.find((item) => item.slug === slug)
 
   if (!project) {

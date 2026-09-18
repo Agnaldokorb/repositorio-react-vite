@@ -1,26 +1,22 @@
-import { Link } from 'react-router'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { Link } from "react-router";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
-import ProjectCard from '@/components/projects/ProjectCard'
-import { projects } from '@/data/projects'
+import ProjectsGrid from "@/components/projects/ProjectsGrid";
+import { useProjects } from "@/hooks/useProjects";
 
-const technologies = [
-  'React',
-  'JavaScript',
-  'Tailwind CSS',
-  'Supabase',
-]
+const technologies = ["React", "JavaScript", "Tailwind CSS", "Supabase"];
 
 export default function Home() {
-  const featuredProjects = projects.slice(0, 3)
+  const { projects, loading, error } = useProjects();
+
+  const featuredProjects = projects
+    .filter((project) => project.featured)
+    .slice(0, 3);
 
   return (
     <main>
       {/* Apresentação */}
-      <section
-        aria-labelledby="intro-title"
-        className="border-b border-border"
-      >
+      <section aria-labelledby="intro-title" className="border-b border-border">
         <div className="mx-auto grid max-w-5xl items-center gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-6">
             <p className="text-sm font-medium tracking-wide text-muted-foreground">
@@ -35,9 +31,8 @@ export default function Home() {
             </h1>
 
             <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Este é meu espaço para apresentar o que estou
-              construindo, compartilhar aprendizados e criar
-              novas conexões.
+              Este é meu espaço para apresentar o que estou construindo,
+              compartilhar aprendizados e criar novas conexões.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -131,17 +126,12 @@ export default function Home() {
           </Link>
         </div>
 
-        {featuredProjects.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        ) : (
-          <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-            Novos projetos serão publicados em breve.
-          </p>
-        )}
+        <ProjectsGrid
+          projects={featuredProjects}
+          loading={loading}
+          error={error}
+          emptyMessage="Novos destaques serão publicados em breve."
+        />
       </section>
 
       {/* Convite para contato */}
@@ -159,8 +149,8 @@ export default function Home() {
             </h2>
 
             <p className="leading-relaxed text-muted-foreground">
-              Se algum projeto chamou sua atenção ou você
-              quer conversar sobre uma ideia, entre em contato.
+              Se algum projeto chamou sua atenção ou você quer conversar sobre
+              uma ideia, entre em contato.
             </p>
           </div>
 
@@ -174,5 +164,5 @@ export default function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }
