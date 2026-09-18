@@ -1,14 +1,9 @@
 import { Link } from "react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 
-<<<<<<< HEAD
 import ProjectsGrid from "@/components/projects/ProjectsGrid";
 import { useProjects } from "@/hooks/useProjects";
-=======
-import ProjectCard from '@/components/projects/ProjectCard'
-import { projects } from '@/data/projects'
-import MinhaImagem from '@/components/layout/minhaImagem'
->>>>>>> feat/imagens-projetos
+import MinhaImagem from "@/components/layout/minhaImagem";
 
 const technologies = ["React", "JavaScript", "Tailwind CSS", "Supabase"];
 
