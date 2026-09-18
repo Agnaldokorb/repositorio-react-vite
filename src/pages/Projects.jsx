@@ -1,7 +1,9 @@
-import ProjectCard from '@/components/projects/ProjectCard'
-import { projects } from '@/data/projects'
+import ProjectsGrid from '@/components/projects/ProjectsGrid'
+import { useProjects } from '@/hooks/useProjects'
 
 export default function Projects() {
+  const { projects, loading, error } = useProjects()
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-20">
       <div className="mb-8 max-w-2xl space-y-4 md:mb-12">
@@ -19,17 +21,11 @@ export default function Projects() {
         </p>
       </div>
 
-      {projects.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-      ) : (
-        <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-          Novos projetos serão publicados em breve.
-        </p>
-      )}
+      <ProjectsGrid
+        projects={projects}
+        loading={loading}
+        error={error}
+      />
     </main>
   )
 }
