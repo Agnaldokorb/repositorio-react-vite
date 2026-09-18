@@ -1,14 +1,35 @@
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { ArrowUpRight, FolderCode } from 'lucide-react'
 
 export default function ProjectCard({ project }) {
+  const [failedUrl, setFailedUrl] = useState(null)
+  const imageUrl = project.cover_path?.trim()
+  const showImage = imageUrl && failedUrl !== imageUrl
+
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground">
-      <div className="flex aspect-video items-center justify-center border-b border-border bg-muted/50">
-        <FolderCode
-          className="size-14 text-muted-foreground"
-          aria-hidden="true"
-        />
+      <div className="aspect-video overflow-hidden border-b border-border bg-muted/50">
+        {showImage ? (
+          <img
+            src={imageUrl}
+            alt={`Capa do projeto ${project.title}`}
+            width={1280}
+            height={720}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailedUrl(imageUrl)}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <FolderCode
+              className="size-14 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span className="sr-only">Capa indisponível</span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
