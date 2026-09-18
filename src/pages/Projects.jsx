@@ -1,20 +1,35 @@
-import { Link } from 'react-router'
+import ProjectCard from '@/components/projects/ProjectCard'
+import { projects } from '@/data/projects'
 
 export default function Projects() {
   return (
-    <main className="mx-auto max-w-5xl space-y-6 px-6 py-16">
-      <h1 className="text-4xl font-bold">Meus projetos</h1>
+    <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-20">
+      <div className="mb-8 max-w-2xl space-y-4 md:mb-12">
+        <p className="text-sm font-medium text-muted-foreground">
+          Portfólio
+        </p>
 
-      <p className="text-muted-foreground">
-        Aqui você encontrará meus trabalhos.
-      </p>
+        <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
+          Meus projetos
+        </h1>
 
-      <Link
-        to="/projetos/projeto-exemplo"
-        className="underline underline-offset-4"
-      >
-        Abrir projeto de exemplo
-      </Link>
+        <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
+          Conheça o que estou construindo e as tecnologias
+          utilizadas em cada projeto.
+        </p>
+      </div>
+
+      {projects.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      ) : (
+        <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
+          Novos projetos serão publicados em breve.
+        </p>
+      )}
     </main>
   )
 }

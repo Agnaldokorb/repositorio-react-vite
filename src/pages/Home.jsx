@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router'
 
 export default function Home() {
+  const navigate = useNavigate();
+
   return (
-    <main className="min-h-screen bg-background px-6 py-20 text-foreground">
+    <main className="bg-background px-6 py-20 text-foreground">
       <div className="mx-auto max-w-5xl space-y-6">
         <p className="text-sm text-muted-foreground">Portfólio profissional</p>
 
@@ -14,7 +17,7 @@ export default function Home() {
           Conheça meus projetos, minha trajetória e minhas habilidades.
         </p>
 
-        <Button>Conhecer meus projetos</Button>
+        <Button onClick={() => navigate('/projetos')}>Conhecer meus projetos</Button>
       </div>
     </main>
   );
