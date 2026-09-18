@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react'
 
 import ProjectCard from '@/components/projects/ProjectCard'
 import { projects } from '@/data/projects'
+import MinhaImagem from '@/components/layout/minhaImagem'
 
 const technologies = [
   'React',
@@ -60,20 +61,7 @@ export default function Home() {
           </div>
 
           {/* Identidade visual */}
-          <div
-            aria-hidden="true"
-            className="relative mx-auto flex aspect-square w-full max-w-72 items-center justify-center rounded-3xl border border-border bg-muted/40 sm:max-w-80 lg:max-w-none"
-          >
-            <div className="absolute inset-5 rounded-2xl border border-border" />
-
-            <span className="text-8xl font-black tracking-tighter sm:text-9xl">
-              AK<span className="text-muted-foreground">.</span>
-            </span>
-
-            <span className="absolute bottom-9 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-              Agnaldo Korb
-            </span>
-          </div>
+          <MinhaImagem />
         </div>
       </section>
 
