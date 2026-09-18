@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { ArrowUpRight, FolderCode } from 'lucide-react'
+import { getProjectImageUrl } from '@/lib/projectImages'
 
 export default function ProjectCard({ project }) {
   const [failedUrl, setFailedUrl] = useState(null)
-  const imageUrl = project.cover_path?.trim()
+  const imageUrl = getProjectImageUrl(project.cover_path)
   const showImage = imageUrl && failedUrl !== imageUrl
 
   return (
