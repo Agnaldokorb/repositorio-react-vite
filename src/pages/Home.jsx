@@ -7,12 +7,29 @@ import MinhaImagem from "@/components/layout/minhaImagem";
 
 const technologies = ["React", "JavaScript", "Tailwind CSS", "Supabase"];
 
-export default function Home() {
+export default function Home({ onProjectsClick }) {
   const { projects, loading, error } = useProjects();
 
   const featuredProjects = projects
     .filter((project) => project.featured)
     .slice(0, 3);
+
+  function handleProjectsClick(event) {
+  if (
+    !onProjectsClick ||
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  onProjectsClick()
+}
 
   return (
     <main>
@@ -39,6 +56,7 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/projetos"
+                onClick={handleProjectsClick}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
               >
                 Conhecer projetos
@@ -107,6 +125,7 @@ export default function Home() {
 
           <Link
             to="/projetos"
+            onClick={handleProjectsClick}
             className="inline-flex min-h-11 items-center gap-2 self-start rounded-lg text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
             Ver todos os projetos
