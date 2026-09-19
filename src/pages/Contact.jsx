@@ -257,7 +257,7 @@ export default function Contact() {
                   options={{
                     action: "contact",
                     theme: "auto",
-                    size: "compact",
+                    size: "flexible",
                     language: "pt-BR",
                   }}
                   onSuccess={(token) => {
