@@ -1,41 +1,82 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowUpRight, MessageSquare } from 'lucide-react'
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { ArrowUpRight, MessageSquare } from "lucide-react";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { contactSchema } from '@/schemas/contactSchema'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { contactSchema } from "@/schemas/contactSchema";
+import { sendContact } from "@/services/contactService";
 
 export default function Contact() {
-  const [feedback, setFeedback] = useState('')
+  const [feedback, setFeedback] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [securityError, setSecurityError] = useState("");
+
+  const turnstileRef = useRef(null);
+  const sendingRef = useRef(false);
+
+  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(contactSchema),
     defaultValues: {
-      name: '',
-      email: '',
-      message: '',
+      name: "",
+      email: "",
+      message: "",
     },
-    mode: 'onBlur',
-  })
+    mode: "onBlur",
+  });
 
-  function handleValidForm() {
-    setFeedback(
-      'Campos validados. Nenhuma mensagem foi enviada: o envio ainda está em preparação.',
-    )
+  function handleSecurityError() {
+    setTurnstileToken("");
+    setSecurityError(
+      "Não foi possível carregar a verificação. Atualize a página ou envie um e-mail para contato@agnaldo.dev.br.",
+    );
+  }
+
+  async function handleValidForm(values) {
+    if (sendingRef.current) return;
+
+    setFeedback("");
+
+    if (!turnstileToken) {
+      setSecurityError("Conclua a verificação de segurança antes de enviar.");
+      return;
+    }
+
+    sendingRef.current = true;
+    setSecurityError("");
+
+    try {
+      await sendContact(values, turnstileToken);
+
+      reset();
+      setFeedback("Sua mensagem foi aceita para envio. Obrigado pelo contato!");
+    } catch (error) {
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar sua mensagem. Tente novamente.",
+      );
+    } finally {
+      sendingRef.current = false;
+      setTurnstileToken("");
+      turnstileRef.current?.reset();
+    }
   }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 md:py-20">
       <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-        {/* Apresentação */}
         <section aria-labelledby="contact-title" className="space-y-6">
           <div
             aria-hidden="true"
@@ -45,9 +86,7 @@ export default function Contact() {
           </div>
 
           <div className="space-y-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              CONTATO
-            </p>
+            <p className="text-sm font-medium text-muted-foreground">CONTATO</p>
 
             <h1
               id="contact-title"
@@ -57,24 +96,32 @@ export default function Contact() {
             </h1>
 
             <p className="max-w-lg leading-relaxed text-muted-foreground">
-              Tem uma ideia, uma sugestão ou quer conhecer melhor
-              meu trabalho? Este espaço será nosso canal de contato.
+              Tem uma ideia, uma sugestão ou quer conhecer melhor meu trabalho?
+              Envie sua mensagem pelo formulário.
             </p>
           </div>
 
-          <a
-            href="https://github.com/Agnaldokorb"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-          >
-            Ver meu GitHub
-            <ArrowUpRight className="size-4" aria-hidden="true" />
-            <span className="sr-only"> — abre em uma nova aba</span>
-          </a>
+          <div className="flex flex-col items-start gap-3">
+            <a
+              href="mailto:contato@agnaldo.dev.br"
+              className="inline-flex min-h-11 items-center break-all rounded-lg text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            >
+              contato@agnaldo.dev.br
+            </a>
+
+            <a
+              href="https://github.com/Agnaldokorb"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            >
+              Ver meu GitHub
+              <ArrowUpRight className="size-4" aria-hidden="true" />
+              <span className="sr-only"> — abre em uma nova aba</span>
+            </a>
+          </div>
         </section>
 
-        {/* Formulário */}
         <section
           aria-labelledby="form-title"
           className="min-w-0 rounded-2xl border border-border bg-card p-5 text-card-foreground sm:p-8"
@@ -87,19 +134,18 @@ export default function Contact() {
             id="form-notice"
             className="mt-2 text-sm leading-relaxed text-muted-foreground"
           >
-            Formulário em preparação: você pode testar os campos,
-            mas as mensagens ainda não são enviadas.
-            Todos os campos são obrigatórios.
+            Sua mensagem será encaminhada para meu e-mail. Todos os campos são
+            obrigatórios.
           </p>
 
           <form
             noValidate
             aria-describedby="form-notice"
-            onSubmit={handleSubmit(
-              handleValidForm,
-              () => setFeedback(''),
-            )}
-            onChange={() => setFeedback('')}
+            aria-busy={isSubmitting}
+            onSubmit={(event) => {
+              void handleSubmit(handleValidForm, () => setFeedback(""))(event);
+            }}
+            onChange={() => setFeedback("")}
             className="mt-6 space-y-6"
           >
             <div className="space-y-2">
@@ -111,13 +157,14 @@ export default function Contact() {
                 autoComplete="name"
                 placeholder="Como você se chama?"
                 required
+                readOnly={isSubmitting}
                 maxLength={100}
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={
-                  errors.name ? 'contact-name-error' : undefined
+                  errors.name ? "contact-name-error" : undefined
                 }
                 className="min-h-12 text-base md:text-base"
-                {...register('name')}
+                {...register("name")}
               />
 
               {errors.name && (
@@ -143,13 +190,14 @@ export default function Contact() {
                 spellCheck={false}
                 placeholder="voce@exemplo.com"
                 required
+                readOnly={isSubmitting}
                 maxLength={254}
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={
-                  errors.email ? 'contact-email-error' : undefined
+                  errors.email ? "contact-email-error" : undefined
                 }
                 className="min-h-12 text-base md:text-base"
-                {...register('email')}
+                {...register("email")}
               />
 
               {errors.email && (
@@ -170,16 +218,17 @@ export default function Contact() {
                 id="contact-message"
                 placeholder="Conte um pouco sobre sua ideia..."
                 required
+                readOnly={isSubmitting}
                 rows={6}
                 maxLength={2000}
                 aria-invalid={Boolean(errors.message)}
                 aria-describedby={
                   errors.message
-                    ? 'contact-message-help contact-message-error'
-                    : 'contact-message-help'
+                    ? "contact-message-help contact-message-error"
+                    : "contact-message-help"
                 }
                 className="min-h-40 resize-y text-base md:text-base"
-                {...register('message')}
+                {...register("message")}
               />
 
               <p
@@ -200,20 +249,61 @@ export default function Contact() {
               )}
             </div>
 
+            <div className="space-y-2">
+              {siteKey ? (
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={siteKey}
+                  options={{
+                    action: "contact",
+                    theme: "auto",
+                    size: "compact",
+                    language: "pt-BR",
+                  }}
+                  onSuccess={(token) => {
+                    setTurnstileToken(token);
+                    setSecurityError("");
+                  }}
+                  onExpire={() => setTurnstileToken("")}
+                  onTimeout={() => setTurnstileToken("")}
+                  onError={handleSecurityError}
+                  onUnsupported={handleSecurityError}
+                  scriptOptions={{
+                    onError: handleSecurityError,
+                  }}
+                />
+              ) : (
+                <p role="alert" className="text-sm text-destructive">
+                  O formulário está temporariamente indisponível. Entre em
+                  contato pelo e-mail contato@agnaldo.dev.br.
+                </p>
+              )}
+
+              {securityError && (
+                <p role="alert" className="text-sm text-destructive">
+                  {securityError}
+                </p>
+              )}
+            </div>
+
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !siteKey || !turnstileToken}
               className="min-h-12 w-full sm:w-auto sm:px-6"
             >
-              {isSubmitting ? 'Validando...' : 'Testar formulário'}
+              {isSubmitting ? "Enviando..." : "Enviar mensagem"}
             </Button>
 
-            <p role="status" className="text-sm text-muted-foreground">
+            <p
+              role="status"
+              aria-atomic="true"
+              className="text-sm text-muted-foreground"
+            >
               {feedback}
             </p>
           </form>
         </section>
       </div>
     </main>
-  )
+  );
 }
