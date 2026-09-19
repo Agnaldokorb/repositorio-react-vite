@@ -35,7 +35,7 @@ export default function ProjectsIntro({ onFinish }) {
 
     const timer = window.setTimeout(() => {
       setCount(5);
-    }, 2200);
+    }, 6000);
 
     return () => window.clearTimeout(timer);
   }, [reducedMotion]);
