@@ -5,6 +5,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProjectsIntro from "@/components/projects/ProjectsIntro";
 
+const SiteBackground = lazy(() => import("@/components/layout/SiteBackground"));
+
 const Home = lazy(() => import("@/pages/Home"));
 const Projects = lazy(() => import("@/pages/Projects"));
 const ProjectDetails = lazy(() => import("@/pages/ProjectDetails"));
@@ -49,16 +51,20 @@ export default function App() {
     try {
       sessionStorage.setItem(INTRO_STORAGE_KEY, "true");
     } catch {
-      // O estado React mantém a preferência enquanto o app estiver aberto.
+      // Mantém a preferência no estado enquanto o app estiver aberto.
     }
 
     navigate("/projetos");
   }, [navigate]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Header onProjectsClick={openProjects} />
+    <div className="relative isolate min-h-screen bg-background text-foreground">
+      {/* Fundo fixo compartilhado entre todas as páginas */}
+      <Suspense fallback={null}>
+        <SiteBackground />
+      </Suspense>
 
+<<<<<<< HEAD
       <div className="flex-1">
         <Suspense
           fallback={
@@ -71,19 +77,41 @@ export default function App() {
         >
           <Routes>
             <Route path="/" element={<Home onProjectsClick={openProjects} />} />
+=======
+      {/* Conteúdo acima do fundo */}
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <Header onProjectsClick={openProjects} />
+>>>>>>> feat/galeria-imagens-projeto
 
-            <Route path="/projetos" element={<Projects />} />
+        <div className="flex-1">
+          <Suspense
+            fallback={
+              <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+                <p role="status" className="text-muted-foreground">
+                  Carregando página...
+                </p>
+              </main>
+            }
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={<Home onProjectsClick={openProjects} />}
+              />
 
-            <Route path="/projetos/:slug" element={<ProjectDetails />} />
+              <Route path="/projetos" element={<Projects />} />
 
-            <Route path="/contato" element={<Contact />} />
+              <Route path="/projetos/:slug" element={<ProjectDetails />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+              <Route path="/contato" element={<Contact />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </div>
+
+        <Footer />
       </div>
-
-      <Footer />
 
       {showIntro && <ProjectsIntro onFinish={finishIntro} />}
     </div>
