@@ -5,16 +5,17 @@ export async function getProjects(signal) {
     .from("projects")
     .select(
       `
-      id,
-      slug,
-      title,
-      summary,
-      description,
-      technologies,
-      cover_path,
-      featured,
-      sort_order
-    `,
+        id,
+        slug,
+        title,
+        summary,
+        description,
+        technologies,
+        cover_path,
+        gallery_images,
+        featured,
+        sort_order
+      `,
     )
     .eq("published", true)
     .order("sort_order", { ascending: true })
