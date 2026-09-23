@@ -63,10 +63,6 @@ export default function App() {
         <SiteBackground />
       </Suspense>
 
-<<<<<<< HEAD
-=======
-      {/* Conteúdo acima do fundo */}
->>>>>>> develop
       <div className="relative z-10 flex min-h-screen flex-col">
         <Header onProjectsClick={openProjects} />
 
