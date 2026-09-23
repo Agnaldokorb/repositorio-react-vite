@@ -15,6 +15,36 @@ describe('Cartão de projeto', () => {
     expect(screen.getByRole('list', { name: 'Tecnologias utilizadas' })).toHaveTextContent('React')
   })
 
+  it('mostra o preview e mantém o link para os detalhes', () => {
+  render(card({
+    ...project,
+    preview_url: 'https://example.com/demo',
+  }))
+
+  expect(
+    screen.getByRole('link', { name: /Ver projeto online:/ }),
+  ).toHaveAttribute('href', 'https://example.com/demo')
+
+  expect(
+    screen.getByRole('link', { name: /Ver projeto:/ }),
+  ).toHaveAttribute('href', `/projetos/${project.slug}`)
+})
+
+it('mantém os detalhes disponíveis quando não há preview', () => {
+  render(card({
+    ...project,
+    preview_url: null,
+  }))
+
+  expect(
+    screen.queryByRole('link', { name: /Ver projeto online:/ }),
+  ).not.toBeInTheDocument()
+
+  expect(
+    screen.getByRole('link', { name: /Ver projeto:/ }),
+  ).toBeInTheDocument()
+})
+
   it('usa alternativa quando não há capa', () => {
     render(card({ ...project, cover_path: null }))
     expect(screen.queryByRole('img')).not.toBeInTheDocument()

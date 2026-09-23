@@ -29,6 +29,100 @@ function renderApp(path = "/") {
 }
 
 describe("Navegação e páginas integradas", () => {
+  it("mantém o preview do projeto ao navegar do card aos detalhes", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(getProjects).mockResolvedValue([
+      {
+        ...project,
+        preview_url: "https://example.com/demo",
+      },
+    ]);
+
+    renderApp("/projetos");
+
+    expect(
+      await screen.findByRole("link", { name: /Ver projeto online:/ }),
+    ).toHaveAttribute("href", "https://example.com/demo");
+
+    await user.click(screen.getByRole("link", { name: /Ver projeto:/ }));
+
+    await screen.findByRole("heading", {
+      level: 1,
+      name: project.title,
+    });
+
+    expect(
+      screen.getByRole("link", { name: /Ver projeto online:/ }),
+    ).toHaveAttribute("href", "https://example.com/demo");
+  });
+
+  it("não apresenta preview nos detalhes quando não há endereço", async () => {
+    vi.mocked(getProjects).mockResolvedValue([
+      {
+        ...project,
+        preview_url: null,
+      },
+    ]);
+
+    renderApp(`/projetos/${project.slug}`);
+
+    await screen.findByRole("heading", {
+      level: 1,
+      name: project.title,
+    });
+
+    expect(
+      screen.queryByRole("link", { name: /Ver projeto online:/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("mostra a galeria somente nos detalhes do projeto", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(getProjects).mockResolvedValue([
+      {
+        ...project,
+        gallery_images: [
+          {
+            src: "https://example.com/tela.webp",
+            label: "Página inicial",
+            alt: "Tela inicial do projeto",
+          },
+        ],
+      },
+    ]);
+
+    renderApp("/projetos");
+
+    const detailsLink = await screen.findByRole("link", {
+      name: /Ver projeto:/,
+    });
+
+    expect(
+      screen.queryByRole("region", { name: "Galeria do projeto" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(detailsLink);
+
+    expect(
+      await screen.findByRole("img", {
+        name: "Tela inicial do projeto",
+      }),
+    ).toHaveAttribute("src", "https://example.com/tela.webp");
+
+    await user.click(screen.getByRole("link", { name: "Voltar aos projetos" }));
+
+    await screen.findByRole("heading", {
+      level: 1,
+      name: "Meus projetos",
+    });
+
+    expect(
+      screen.queryByRole("region", { name: "Galeria do projeto" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("navega da listagem aos detalhes e retorna", async () => {
     const user = userEvent.setup();
     renderApp("/projetos");
