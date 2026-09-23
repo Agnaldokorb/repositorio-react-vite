@@ -64,24 +64,9 @@ export default function App() {
         <SiteBackground />
       </Suspense>
 
-<<<<<<< HEAD
-      <div className="flex-1">
-        <Suspense
-          fallback={
-            <main className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-              <p role="status" className="text-muted-foreground">
-                Carregando página...
-              </p>
-            </main>
-          }
-        >
-          <Routes>
-            <Route path="/" element={<Home onProjectsClick={openProjects} />} />
-=======
       {/* Conteúdo acima do fundo */}
       <div className="relative z-10 flex min-h-screen flex-col">
         <Header onProjectsClick={openProjects} />
->>>>>>> feat/galeria-imagens-projeto
 
         <div className="flex-1">
           <Suspense

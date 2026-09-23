@@ -357,7 +357,7 @@ function createGallery(container, items, options) {
   }
 
   try {
-    items.forEach((item) => {
+    items.forEach(() => {
       const texture = new Texture(gl, {
         generateMipmaps: false,
         minFilter: gl.LINEAR,
