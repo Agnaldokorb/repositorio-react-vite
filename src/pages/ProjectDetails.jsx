@@ -5,6 +5,7 @@ import { useProjects } from "@/hooks/useProjects";
 import NotFound from "@/pages/NotFound";
 import { Spinner } from "@/components/ui/spinner";
 import ProjectGallery from "@/components/projects/ProjectGallery";
+import ProjectPreviewLink from "@/components/projects/ProjectPreviewLink";
 
 export default function ProjectDetails() {
   const { slug } = useParams();
@@ -61,6 +62,14 @@ export default function ProjectDetails() {
           <p className="text-lg leading-relaxed text-muted-foreground">
             {project.summary}
           </p>
+
+          <div>
+            <ProjectPreviewLink
+              url={project.preview_url}
+              title={project.title}
+              className="w-full sm:w-auto"
+            />
+          </div>
 
           <ul
             aria-label="Tecnologias utilizadas"

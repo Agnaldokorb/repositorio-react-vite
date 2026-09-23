@@ -1,12 +1,13 @@
-import { useState } from 'react'
-import { Link } from 'react-router'
-import { ArrowUpRight, FolderCode } from 'lucide-react'
-import { getProjectImageUrl } from '@/lib/projectImages'
+import { useState } from "react";
+import { Link } from "react-router";
+import { ArrowUpRight, FolderCode } from "lucide-react";
+import { getProjectImageUrl } from "@/lib/projectImages";
+import ProjectPreviewLink from "@/components/projects/ProjectPreviewLink";
 
 export default function ProjectCard({ project }) {
-  const [failedUrl, setFailedUrl] = useState(null)
-  const imageUrl = getProjectImageUrl(project.cover_path)
-  const showImage = imageUrl && failedUrl !== imageUrl
+  const [failedUrl, setFailedUrl] = useState(null);
+  const imageUrl = getProjectImageUrl(project.cover_path);
+  const showImage = imageUrl && failedUrl !== imageUrl;
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground">
@@ -56,15 +57,23 @@ export default function ProjectCard({ project }) {
           ))}
         </ul>
 
-        <Link
-          to={`/projetos/${project.slug}`}
-          aria-label={`Ver projeto: ${project.title}`}
-          className="mt-auto inline-flex min-h-11 items-center justify-between gap-3 rounded-lg pt-3 text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-        >
-          Ver projeto
-          <ArrowUpRight className="size-4" aria-hidden="true" />
-        </Link>
+        <div className="mt-auto flex flex-col gap-3 pt-3">
+          <Link
+            to={`/projetos/${project.slug}`}
+            aria-label={`Ver projeto: ${project.title}`}
+            className="inline-flex min-h-11 items-center justify-between gap-3 rounded-lg text-sm font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          >
+            Ver projeto
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </Link>
+
+          <ProjectPreviewLink
+            url={project.preview_url}
+            title={project.title}
+            className="w-full"
+          />
+        </div>
       </div>
     </article>
-  )
+  );
 }
