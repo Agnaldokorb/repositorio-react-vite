@@ -12,6 +12,7 @@ const Projects = lazy(() => import('@/pages/Projects'))
 const ProjectDetails = lazy(() => import('@/pages/ProjectDetails'))
 const Contact = lazy(() => import('@/pages/Contact'))
 const NotFound = lazy(() => import('@/pages/NotFound'))
+const Education = lazy(() => import('@/pages/Education'))
 
 const INTRO_STORAGE_KEY = 'portfolio:projects-intro-seen'
 
@@ -90,6 +91,8 @@ export default function App() {
               />
 
               <Route path="/contato" element={<Contact />} />
+
+              <Route path="/formacao" element={<Education />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

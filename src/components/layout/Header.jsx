@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/sheet";
 
 const navigation = [
-  { to: "/", label: "Início" },
-  { to: "/projetos", label: "Projetos" },
-  { to: "/contato", label: "Contato" },
-];
+  { to: '/', label: 'Início' },
+  { to: '/projetos', label: 'Projetos' },
+  { to: '/formacao', label: 'Formação' },
+  { to: '/contato', label: 'Contato' },
+]
 
 export default function Header({ onProjectsClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
