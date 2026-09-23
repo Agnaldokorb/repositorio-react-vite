@@ -6,6 +6,12 @@ import App from "./App";
 import { getProjects } from "@/services/projectsService";
 import { project } from "@/test/fixtures";
 import { mockMatchMedia } from "@/test/browser";
+import { getCourses } from "@/services/coursesService";
+import { ongoingCourse } from "@/test/courseFixtures";
+
+vi.mock("@/services/coursesService", () => ({
+  getCourses: vi.fn(),
+}));
 
 vi.mock("@/components/layout/SiteBackground", () => ({
   default: () => null,
@@ -16,7 +22,10 @@ vi.mock("@/services/projectsService", () => ({ getProjects: vi.fn() }));
 let changeMedia;
 beforeEach(() => {
   changeMedia = mockMatchMedia();
+
   vi.mocked(getProjects).mockReset().mockResolvedValue([project]);
+
+  vi.mocked(getCourses).mockReset().mockResolvedValue([ongoingCourse]);
 });
 afterEach(() => vi.unstubAllGlobals());
 
@@ -29,6 +38,28 @@ function renderApp(path = "/") {
 }
 
 describe("Navegação e páginas integradas", () => {
+  it("navega para Formação pelo menu principal", async () => {
+    const user = userEvent.setup();
+
+    renderApp();
+
+    const navigation = screen.getByRole("navigation", {
+      name: "Navegação principal",
+    });
+
+    await user.click(
+      within(navigation).getByRole("link", { name: "Formação" }),
+    );
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Formação" }),
+    ).toBeInTheDocument();
+
+    expect(
+      await screen.findByRole("heading", { name: ongoingCourse.title }),
+    ).toBeInTheDocument();
+  });
+
   it("mantém o preview do projeto ao navegar do card aos detalhes", async () => {
     const user = userEvent.setup();
 
