@@ -150,3 +150,25 @@
     animation: none;
   }
 }
+
+@keyframes whatsapp-color {
+  0%,
+  100% {
+    background-color: #075e54;
+  }
+
+  50% {
+    background-color: #128c4a;
+  }
+}
+
+.whatsapp-color {
+  animation: whatsapp-color 3s ease-in-out infinite;
+}
+
+/* Respeita quem prefere reduzir animações. */
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-color {
+    animation: none;
+  }
+}
