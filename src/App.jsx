@@ -1,68 +1,68 @@
-import { lazy, Suspense, useCallback, useState } from 'react'
-import { Route, Routes, useLocation, useNavigate } from 'react-router'
+import { lazy, Suspense, useCallback, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import ProjectsIntro from '@/components/projects/ProjectsIntro'
-import WhatsAppButton from '@/components/layout/WhatsAppButton'
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ProjectsIntro from "@/components/projects/ProjectsIntro";
+import WhatsAppButton from "@/components/layout/WhatsAppButton";
 
-const SiteBackground = lazy(() => import('@/components/layout/SiteBackground'))
+const SiteBackground = lazy(() => import("@/components/layout/SiteBackground"));
 
-const Home = lazy(() => import('@/pages/Home'))
-const Projects = lazy(() => import('@/pages/Projects'))
-const ProjectDetails = lazy(() => import('@/pages/ProjectDetails'))
-const Contact = lazy(() => import('@/pages/Contact'))
-const NotFound = lazy(() => import('@/pages/NotFound'))
-const Education = lazy(() => import('@/pages/Education'))
+const Home = lazy(() => import("@/pages/Home"));
+const Projects = lazy(() => import("@/pages/Projects"));
+const ProjectDetails = lazy(() => import("@/pages/ProjectDetails"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const Education = lazy(() => import("@/pages/Education"));
 
-const INTRO_STORAGE_KEY = 'portfolio:projects-intro-seen'
+const INTRO_STORAGE_KEY = "portfolio:projects-intro-seen";
 
 export default function App() {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [introLocationKey, setIntroLocationKey] = useState(null)
+  const [introLocationKey, setIntroLocationKey] = useState(null);
 
   const [introSeen, setIntroSeen] = useState(() => {
     try {
-      return sessionStorage.getItem(INTRO_STORAGE_KEY) === 'true'
+      return sessionStorage.getItem(INTRO_STORAGE_KEY) === "true";
     } catch {
-      return false
+      return false;
     }
-  })
+  });
 
-  const showIntro = introLocationKey === location.key
+  const showIntro = introLocationKey === location.key;
 
   const openProjects = useCallback(() => {
     if (
       introSeen ||
-      location.pathname === '/projetos' ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      location.pathname === "/projetos" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      navigate('/projetos')
-      return
+      navigate("/projetos");
+      return;
     }
 
-    setIntroLocationKey(location.key)
-  }, [introSeen, location.key, location.pathname, navigate])
+    setIntroLocationKey(location.key);
+  }, [introSeen, location.key, location.pathname, navigate]);
 
   const finishIntro = useCallback(() => {
-    setIntroLocationKey(null)
-    setIntroSeen(true)
+    setIntroLocationKey(null);
+    setIntroSeen(true);
 
     try {
-      sessionStorage.setItem(INTRO_STORAGE_KEY, 'true')
+      sessionStorage.setItem(INTRO_STORAGE_KEY, "true");
     } catch {
       // Mantém a preferência no estado enquanto o app estiver aberto.
     }
 
-    navigate('/projetos')
-  }, [navigate])
+    navigate("/projetos");
+  }, [navigate]);
 
   return (
     <div className="relative isolate min-h-screen bg-background text-foreground">
       <Suspense fallback={null}>
-        <SiteBackground />
+        <SiteBackground speed={32} opacity={0.4} />
       </Suspense>
 
       <div className="relative z-10 flex min-h-screen flex-col">
@@ -86,10 +86,7 @@ export default function App() {
 
               <Route path="/projetos" element={<Projects />} />
 
-              <Route
-                path="/projetos/:slug"
-                element={<ProjectDetails />}
-              />
+              <Route path="/projetos/:slug" element={<ProjectDetails />} />
 
               <Route path="/contato" element={<Contact />} />
 
@@ -102,9 +99,9 @@ export default function App() {
 
         <Footer />
       </div>
-      
+
       {!showIntro && <WhatsAppButton />}
       {showIntro && <ProjectsIntro onFinish={finishIntro} />}
     </div>
-  )
+  );
 }

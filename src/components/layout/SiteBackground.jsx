@@ -1,253 +1,178 @@
-import { useEffect, useRef } from 'react'
-import * as THREE from 'three'
+"use client";
 
-const vertexShader = `
-  varying vec2 vUv;
+import { useEffect, useRef, useState } from "react";
 
-  void main() {
-    vUv = uv;
-    gl_Position = vec4(position, 1.0);
+const lines = [
+  "// Transformando ideias em código",
+  "import { createApp } from './core'",
+  "",
+  "const theme = {",
+  "  primary: '#023e8a',",
+  "  accent: '#90e0ef',",
+  "  background: '#f4fcfe',",
+  "}",
+  "",
+  "async function buildExperience() {",
+  "  const app = createApp({ theme })",
+  "",
+  "  await app.connect()",
+  "",
+  "  app.render({",
+  "    title: 'Sua próxima ideia',",
+  "    responsive: true,",
+  "    animations: true,",
+  "  })",
+  "",
+  "  return app.start()",
+  "}",
+  "",
+  "buildExperience()",
+  "// Pronto para criar algo novo.",
+];
+
+const code = lines.join("\n");
+
+const tokenPattern =
+  /(\/\/.*|'[^']*'|\b(?:import|from|const|async|function|await|return|true|false)\b)/g;
+
+function colorFor(token) {
+  if (token.startsWith("//")) {
+    return "var(--muted-foreground, #005a77)";
   }
-`
 
-const fragmentShader = `
-  precision mediump float;
-
-  uniform vec2 iResolution;
-  uniform float iTime;
-
-  varying vec2 vUv;
-
-  mat2 rotation(float angle) {
-    float c = cos(angle);
-    float s = sin(angle);
-    return mat2(c, -s, s, c);
+  if (token.startsWith("'")) {
+    return "var(--ring, #0077b6)";
   }
 
-  float map(vec3 p) {
-    p.xz *= rotation(iTime * 0.4);
-    p.xy *= rotation(iTime * 0.3);
-
-    vec3 q = p * 2.0 + iTime;
-
-    return length(p + vec3(sin(iTime * 0.7)))
-      * log(length(p) + 1.0)
-      + sin(q.x + sin(q.z + sin(q.y))) * 0.5
-      - 1.0;
+  if (
+    /^(import|from|const|async|function|await|return|true|false)$/.test(token)
+  ) {
+    return "var(--primary, #023e8a)";
   }
 
-  void main() {
-    vec2 fragCoord = vUv * iResolution;
+  return "var(--foreground, #03045e)";
+}
 
-    vec2 uv = (
-      fragCoord - 0.5 * iResolution
-    ) / min(iResolution.x, iResolution.y);
+const tokenizedLines = lines.map((line) =>
+  line.split(tokenPattern).map((text) => ({
+    text,
+    color: colorFor(text),
+  })),
+);
 
-    vec3 color = vec3(0.0);
-    float distanceTravelled = 2.5;
-
-    for (int i = 0; i <= 5; i++) {
-      vec3 p = vec3(0.0, 0.0, 5.0)
-        + normalize(vec3(uv, -1.0)) * distanceTravelled;
-
-      float result = map(p);
-
-      float intensity = clamp(
-        (result - map(p + 0.1)) * 0.5,
-        -0.1,
-        1.0
-      );
-
-      vec3 base = vec3(0.1, 0.3, 0.4)
-        + vec3(5.0, 2.5, 3.0) * intensity;
-
-      color = color * base
-        + (1.0 - smoothstep(0.0, 2.5, result)) * 0.7 * base;
-
-      distanceTravelled += min(result, 1.0);
-    }
-
-    float centerDistance = distance(
-      fragCoord,
-      iResolution * 0.5
-    );
-
-    float radius = min(iResolution.x, iResolution.y) * 0.5;
-
-    float dim = smoothstep(
-      radius * 0.3,
-      radius * 0.5,
-      centerDistance
-    );
-
-    color = mix(color * 0.3, color, dim);
-
-    gl_FragColor = vec4(color, 1.0);
-  }
-`
-
-export default function SiteBackground() {
-  const containerRef = useRef(null)
+export default function SiteBackground({ speed = 32, opacity = 0.15 }) {
+  const [count, setCount] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    let renderer
+    const delay = Number.isFinite(speed) ? Math.max(10, speed) : 32;
 
-    try {
-      renderer = new THREE.WebGLRenderer({
-        antialias: false,
-        alpha: false,
-        powerPreference: 'low-power',
-      })
-    } catch {
-      // O gradiente CSS continua visível se WebGL não estiver disponível.
-      return
+    let timer;
+    let position = 0;
+
+    function tick() {
+      position = position >= code.length ? 0 : position + 1;
+      setCount(position);
+
+      timer = window.setTimeout(tick, position === code.length ? 3000 : delay);
     }
 
-    const canvas = renderer.domElement
-    canvas.style.display = 'block'
-    canvas.style.width = '100%'
-    canvas.style.height = '100%'
-    container.appendChild(canvas)
+    function syncAnimation() {
+      window.clearTimeout(timer);
+      setReducedMotion(media.matches);
 
-    const scene = new THREE.Scene()
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-
-    const uniforms = {
-      iTime: { value: 0 },
-      iResolution: { value: new THREE.Vector2(1, 1) },
-    }
-
-    const geometry = new THREE.PlaneGeometry(2, 2)
-
-    const material = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
-      uniforms,
-      depthTest: false,
-      depthWrite: false,
-    })
-
-    const mesh = new THREE.Mesh(geometry, material)
-    scene.add(mesh)
-
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    )
-
-    let previousTime = null
-    let elapsed = 0
-
-    function renderFrame(time) {
-      if (previousTime !== null) {
-        elapsed += Math.min((time - previousTime) / 1000, 0.1)
+      if (media.matches) {
+        position = code.length;
+        setCount(position);
+        return;
       }
-
-      previousTime = time
-
-      // Velocidade mais suave para um fundo usado durante a leitura.
-      uniforms.iTime.value = elapsed * 0.35
-      renderer.render(scene, camera)
-    }
-
-    function updateAnimation() {
-      renderer.setAnimationLoop(null)
-      previousTime = null
-
-      if (document.hidden) return
-
-      if (reducedMotion.matches) {
-        renderer.render(scene, camera)
-        return
-      }
-
-      renderer.setAnimationLoop(renderFrame)
-    }
-
-    function resize() {
-      const width = Math.max(container.clientWidth, 1)
-      const height = Math.max(container.clientHeight, 1)
-
-      // Evita renderizar em resoluções excessivas em telas de alta densidade.
-      const maxPixels = 2_000_000
-      const pixelRatio = Math.min(
-        window.devicePixelRatio || 1,
-        1.5,
-        Math.sqrt(maxPixels / (width * height)),
-      )
-
-      renderer.setPixelRatio(pixelRatio)
-      renderer.setSize(width, height, false)
-
-      uniforms.iResolution.value.set(width, height)
 
       if (!document.hidden) {
-        renderer.render(scene, camera)
+        timer = window.setTimeout(tick, delay);
       }
     }
 
-    function handleContextLost(event) {
-      event.preventDefault()
-      renderer.setAnimationLoop(null)
-      canvas.style.visibility = 'hidden'
-    }
+    media.addEventListener("change", syncAnimation);
+    document.addEventListener("visibilitychange", syncAnimation);
 
-    function handleContextRestored() {
-      canvas.style.visibility = 'visible'
-      resize()
-      updateAnimation()
-    }
-
-    const observer = new ResizeObserver(resize)
-    observer.observe(container)
-
-    window.addEventListener('resize', resize)
-    document.addEventListener('visibilitychange', updateAnimation)
-    reducedMotion.addEventListener('change', updateAnimation)
-    canvas.addEventListener('webglcontextlost', handleContextLost)
-    canvas.addEventListener('webglcontextrestored', handleContextRestored)
-
-    resize()
-    updateAnimation()
+    syncAnimation();
 
     return () => {
-      observer.disconnect()
+      window.clearTimeout(timer);
+      media.removeEventListener("change", syncAnimation);
+      document.removeEventListener("visibilitychange", syncAnimation);
+    };
+  }, [speed]);
 
-      window.removeEventListener('resize', resize)
-      document.removeEventListener('visibilitychange', updateAnimation)
-      reducedMotion.removeEventListener('change', updateAnimation)
-      canvas.removeEventListener('webglcontextlost', handleContextLost)
-      canvas.removeEventListener('webglcontextrestored', handleContextRestored)
+  useEffect(() => {
+    const element = scrollRef.current;
 
-      renderer.setAnimationLoop(null)
-
-      scene.remove(mesh)
-      geometry.dispose()
-      material.dispose()
-      renderer.dispose()
-
-      canvas.remove()
+    if (element) {
+      element.scrollTop = count === 0 ? 0 : element.scrollHeight;
     }
-  }, [])
+  }, [count]);
+
+  const visibleLines = code.slice(0, count).split("\n");
 
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-0 select-none overflow-hidden bg-background"
     >
       <div
-        ref={containerRef}
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse at 25% 30%, #403060, #142338 55%, #080811)',
+            "radial-gradient(ellipse at top right, var(--secondary, #ade8f4), var(--background, #f4fcfe) 75%)",
         }}
       />
 
-      {/* Usa a cor do tema para preservar a leitura do conteúdo. */}
-      <div className="absolute inset-0 bg-background/50" />
+      <div
+        ref={scrollRef}
+        className="absolute inset-x-0 bottom-0 top-[calc(78px+20px)] overflow-hidden px-6 pb-6 font-mono text-xs leading-[1.9] sm:px-8 sm:text-sm"
+        style={{ opacity }}
+      >
+        {visibleLines.map((line, lineIndex) => {
+          let remaining = line.length;
+
+          return (
+            <div key={lineIndex} className="flex min-h-[1.9em]">
+              <span className="w-[4ch] shrink-0 text-muted-foreground">
+                {String(lineIndex + 1).padStart(2, "0")}
+              </span>
+
+              <span className="whitespace-pre">
+                {tokenizedLines[lineIndex].map((token, tokenIndex) => {
+                  const text = token.text.slice(0, Math.max(0, remaining));
+
+                  remaining -= text.length;
+
+                  return (
+                    <span key={tokenIndex} style={{ color: token.color }}>
+                      {text}
+                    </span>
+                  );
+                })}
+
+                {lineIndex === visibleLines.length - 1 && !reducedMotion && (
+                  <span className="ml-[3px] inline-block h-[1em] w-[2px] animate-pulse bg-primary align-text-bottom motion-reduce:animate-none" />
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, var(--background, #f4fcfe))",
+        }}
+      />
     </div>
-  )
+  );
 }
