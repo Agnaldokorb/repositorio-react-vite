@@ -1,7 +1,8 @@
 import { Link, NavLink } from "react-router";
 import { ArrowUpRight } from "lucide-react";
 import Logo from "@/components/layout/Logo";
-import novoCodeLogo from "@/assets/img/novocode/logo-login.png";
+import novoCodeLight from "@/assets/img/novocode/novocode-preto.png";
+import novoCodeDark from "@/assets/img/novocode/novocode-branco.png";
 
 const navigation = [
   { to: "/", label: "Início" },
@@ -84,12 +85,22 @@ export default function Footer() {
           <div className="flex flex-wrap items-center gap-3">
             <p>Feito com atenção aos detalhes.</p>
 
+            {/* Logo para tema claro */}
             <img
-              src={novoCodeLogo}
+              src={novoCodeLight}
               alt="NovoCode Tecnologia"
               loading="lazy"
               decoding="async"
-              className="h-auto w-24 shrink-0 object-contain sm:w-28"
+              className="block h-auto w-24 shrink-0 object-contain sm:w-28 dark:hidden"
+            />
+
+            {/* Logo para tema escuro */}
+            <img
+              src={novoCodeDark}
+              alt="NovoCode Tecnologia"
+              loading="lazy"
+              decoding="async"
+              className="hidden h-auto w-24 shrink-0 object-contain sm:w-28 dark:block"
             />
           </div>
         </div>
