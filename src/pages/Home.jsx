@@ -5,8 +5,6 @@ import ProjectsGrid from "@/components/projects/ProjectsGrid";
 import { useProjects } from "@/hooks/useProjects";
 import MinhaImagem from "@/components/layout/minhaImagem";
 
-const technologies = ["React", "JavaScript", "Tailwind CSS", "Supabase"];
-
 export default function Home({ onProjectsClick }) {
   const { projects, loading, error } = useProjects();
 
@@ -75,32 +73,6 @@ export default function Home({ onProjectsClick }) {
 
           {/* Identidade visual */}
           <MinhaImagem />
-        </div>
-      </section>
-
-      {/* Tecnologias deste portfólio */}
-      <section
-        aria-labelledby="technologies-title"
-        className="mx-auto max-w-5xl px-4 py-10 sm:px-6"
-      >
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <h2
-            id="technologies-title"
-            className="text-sm font-medium text-muted-foreground"
-          >
-            Tecnologias deste portfólio
-          </h2>
-
-          <ul className="flex flex-wrap gap-2">
-            {technologies.map((technology) => (
-              <li
-                key={technology}
-                className="rounded-full border border-border px-4 py-2 text-sm font-medium"
-              >
-                {technology}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
