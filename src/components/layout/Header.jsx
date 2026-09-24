@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 
 import Logo from "@/components/layout/Logo";
+import ThemeToggle from '@/components/layout/ThemeToggle'
 import {
   Sheet,
   SheetClose,
@@ -89,7 +90,7 @@ export default function Header({ onProjectsClick }) {
         {/* Menu desktop */}
         <nav
           aria-label="Navegação principal"
-          className="hidden items-center gap-2 md:flex"
+          className="hidden items-center gap-2 md:ml-auto md:flex"
         >
           {navigation.map(({ to, label }) => (
             <NavLink
@@ -113,6 +114,8 @@ export default function Header({ onProjectsClick }) {
             </NavLink>
           ))}
         </nav>
+
+        <ThemeToggle />
 
         {/* Menu mobile */}
         <Sheet

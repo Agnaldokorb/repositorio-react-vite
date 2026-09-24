@@ -49,6 +49,7 @@
 }
 
 :root {
+  color-scheme: light;
   --background: #f4fcfe;
   --foreground: #03045e;
 

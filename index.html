@@ -1,13 +1,36 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    <script>
+      (() => {
+        let savedTheme = null;
+
+        try {
+          savedTheme = localStorage.getItem("portfolio:theme");
+        } catch {
+          // Continua usando a preferência do sistema.
+        }
+
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+
+        const dark =
+          savedTheme === "dark" || (savedTheme !== "light" && prefersDark);
+
+        document.documentElement.classList.toggle("dark", dark);
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>portfolio-agnaldo-korb</title>
     <meta name="description" content="Portfólio de Agnaldo Korb" />
     <meta name="author" content="Agnaldo Korb" />
-    <meta name="keywords" content="Portfólio, Agnaldo Korb, Desenvolvedor, Projetos" />
+    <meta
+      name="keywords"
+      content="Portfólio, Agnaldo Korb, Desenvolvedor, Projetos"
+    />
   </head>
   <body>
     <div id="root"></div>
