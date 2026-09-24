@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://agnaldo.dev.br/sitemap.xml
