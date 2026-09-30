@@ -4,7 +4,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import ProjectsIntro from "@/components/projects/ProjectsIntro";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
+import ChatbotWidget from "@/components/layout/ChatbotWidget";
 
 const SiteBackground = lazy(() => import("@/components/layout/SiteBackground"));
 
@@ -100,7 +100,7 @@ export default function App() {
         <Footer />
       </div>
 
-      {!showIntro && <WhatsAppButton />}
+      {!showIntro && <ChatbotWidget />}
       {showIntro && <ProjectsIntro onFinish={finishIntro} />}
     </div>
   );

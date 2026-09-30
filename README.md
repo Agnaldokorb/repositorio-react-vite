@@ -1,6 +1,6 @@
 # Portfólio Agnaldo Korb
 
-Portfólio pessoal para apresentar projetos, formação acadêmica, cursos e certificados, com canais de contato por e-mail e WhatsApp. Interface em português, adaptada para desktop e dispositivos móveis.
+Portfólio pessoal para apresentar projetos, formação acadêmica, cursos e certificados, com canais de contato por e-mail e chatbot integrado ao n8n. Interface em português, adaptada para desktop e dispositivos móveis.
 
 [Acessar o portfólio](https://agnaldo.dev.br) · [GitHub do autor](https://github.com/Agnaldokorb)
 
@@ -11,7 +11,7 @@ Portfólio pessoal para apresentar projetos, formação acadêmica, cursos e cer
 - Galeria circular com WebGL nos detalhes dos projetos, navegação por arraste, botões e teclado. Uma imagem ou preferência por movimento reduzido utiliza apresentação estática; falhas de renderização/carregamento acionam uma alternativa com imagens comuns.
 - Página Formação com cursos em andamento e concluídos, instituição, carga horária e certificados que abrem em nova aba.
 - Formulário de contato com validação, Cloudflare Turnstile e envio por uma Supabase Edge Function integrada ao Resend.
-- Botão flutuante do WhatsApp com mensagem inicial e alternância de tons de verde.
+- Widget flutuante de chatbot que envia mensagens via `POST` para um webhook do n8n (`VITE_N8N_CHAT_URL`) e renderiza a resposta do agente em um chat interno. Quando a variável não é definida, o widget fica oculto.
 - Fundo animado com Three.js, menu mobile e rodapé com a marca NovoCode.
 - Introdução opcional aos projetos: apresentação de seis segundos, contagem de cinco a zero e opção de pular. A conclusão é registrada em `sessionStorage`; a preferência por movimento reduzido evita a introdução na navegação do aplicativo.
 - Efeito de inclinação na introdução por ponteiro ou sensores do celular, quando disponíveis e autorizados.
@@ -27,6 +27,7 @@ Portfólio pessoal para apresentar projetos, formação acadêmica, cursos e cer
 | Formulário | React Hook Form, Zod, resolvers |
 | Dados | Supabase JavaScript SDK e PostgreSQL |
 | Contato | Supabase Edge Functions, Deno/TypeScript, Resend e Cloudflare Turnstile |
+| Chatbot | n8n (webhook que recebe `POST` com `{ chatInput, sessionId }` e responde com JSON em `output`, `text`, `message`, `reply`, `response` ou `answer`, ou texto puro) |
 | Efeitos gráficos | Three.js e OGL |
 | Ícones | Lucide React e React Icons |
 | Qualidade | Vitest 5, Testing Library, jsdom, cobertura V8 e ESLint |
@@ -92,6 +93,7 @@ VITE_TURNSTILE_SITE_KEY=SUA_SITE_KEY
 | `VITE_SUPABASE_URL` | URL do projeto Supabase |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Chave publicável usada pelo frontend |
 | `VITE_TURNSTILE_SITE_KEY` | Chave pública do widget Turnstile |
+| `VITE_N8N_CHAT_URL` | URL do webhook n8n que recebe as mensagens do widget via `POST`; sem ela, o widget é ocultado |
 
 Variáveis com prefixo `VITE_` são incorporadas ao frontend. Não coloque nelas chaves secretas, `service_role`, a chave do Resend ou o segredo do Turnstile. `.env.local` é ignorado pelo Git.
 
@@ -243,7 +245,7 @@ src/
   assets/                   Imagens, certificados e marca NovoCode
   components/
     education/              Cards de cursos e certificados
-    layout/                 Header, footer, fundo e WhatsApp
+    layout/                 Header, footer, fundo e widget de chatbot
     projects/               Cards, galeria, preview e introdução
     ui/                     Componentes de interface e galeria OGL
     unlumen-ui/             Componentes da galeria orbital anterior
@@ -298,8 +300,8 @@ O fundo Three.js pode gerar aviso de chunk acima de 500 kB. O aviso não impede 
 | --- | --- |
 | Projetos, previews e imagens | Table Editor → `projects` |
 | Formação e certificados | Table Editor → `courses` |
-| Número e mensagem do WhatsApp | `src/components/layout/WhatsAppButton.jsx` |
-| Cores e animação do WhatsApp | `src/index.css` |
+| URL do chat n8n (widget de chatbot) | `src/components/layout/ChatbotWidget.jsx` e variável `VITE_N8N_CHAT_URL` |
+| Cores e animação do chatbot | `src/index.css` (variáveis de tema) |
 | Marca no rodapé | `src/components/layout/Footer.jsx` e `src/assets/img/novocode/` |
 | Navegação | `src/components/layout/Header.jsx` e `Footer.jsx` |
 | Título, descrição e favicon | `index.html` e `public/` |
